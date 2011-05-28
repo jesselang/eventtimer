@@ -4,38 +4,54 @@ import gobject
 import timer
 import Xlib.display
 
-black = clutter.Color(0,0,0,255)
-red = clutter.Color(255, 0, 0, 255)
-green = clutter.Color(0,255,0,255)
-blue = clutter.Color(0,0,255,255)
-
 white = clutter.Color (255, 255, 255, 255)
-darkgreen = clutter.Color (0, 128, 0, 255)
+black = clutter.Color(0,0,0,255)
+green = clutter.Color (0, 128, 0, 255)
+yellow = clutter.Color (200, 200, 0, 255)
+orange = clutter.Color (255, 128, 0, 255)
+red = clutter.Color(255, 0, 0, 255)
 
 input = timer.TimeInput ()
 timer = timer.Timer ()
+
+alternate_black = False
 
 def update_timer (timeline=None):
     time_elapsed.set_text (timer.timeelapsed () )
 
     if timer.running ():
         time_remaining.set_text (timer.timeremaining () )
+
+        progress = timer.progress ()
+
+        if timer.secondsremaining () <= 60:
+            global alternate_black
+            alternate_black = not alternate_black
+
+            if alternate_black:
+                stage.set_color (black)
+            else:
+                stage.set_color (red)
+        elif 0.0 <= progress <= 0.5:
+            stage.set_color (green)
+        elif 0.5 <= progress <= 0.75:
+            stage.set_color (yellow)
+        elif 0.75 <= progress <= 0.95:
+            stage.set_color (orange)
+        else:
+            stage.set_color (red)
     else:
         time_remaining.set_text (input.durationstring () )
+        stage.set_color (black)
 
 def parseKeyPress(self, event):
-    # Parses the keyboard
-    #As this is called by the stage object
     character_key = chr(0)
 
     if 0 <= event.keyval <= 255:
         character_key = chr(event.keyval)
-
     if event.keyval == clutter.keysyms.q:
-        #if the user pressed "q" quit the test
         clutter.main_quit()
     elif event.keyval == clutter.keysyms.space:
-        # What about a pause?
         if timer.running ():
             timer.reset ()
         else:
@@ -43,7 +59,6 @@ def parseKeyPress(self, event):
             timer.start ()
     elif character_key.isdigit():
         input.append (chr (event.keyval) )
-        print input
         update_timer ()
     else:
         print 'What to do with: ',  event.keyval
@@ -90,5 +105,5 @@ t.set_loop(True)
 t.connect('completed', update_timer)
 t.start()
 
-gobject.timeout_add(10,redraw)
+gobject.timeout_add(10,redraw_fullscreen)
 clutter.main()

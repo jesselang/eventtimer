@@ -68,6 +68,13 @@ class Timer:
          return 0.0
       else:
          return total_seconds(datetime.datetime.now() - self.started) / total_seconds(self.duration)
+   def secondsremaining (self):
+      if datetime.datetime.now () >= self.ending:
+         self.state = TimerState.Completed
+      elif self.started is None or self.duration is None:
+         return 0
+      else:
+         return total_seconds(self.ending - datetime.datetime.now() )
    def __str__(self):
       return "Time elapsed: " + self.timeelapsed () + "\n" + \
              "Time remaining: " + self.timeremaining() + "\n" + \
