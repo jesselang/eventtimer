@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import clutter
+import datetime
 import gobject
 import timer
 import Xlib.display
@@ -32,14 +33,24 @@ def update_timer (timeline=None):
                 stage.set_color (black)
             else:
                 stage.set_color (red)
-        elif 0.0 <= progress <= 0.5:
-            stage.set_color (green)
-        elif 0.5 <= progress <= 0.75:
-            stage.set_color (yellow)
-        elif 0.75 <= progress <= 0.95:
-            stage.set_color (orange)
+        elif timer.duration <= datetime.timedelta (minutes=20):
+            if 0.0 <= progress <= 0.4:
+                stage.set_color (green)
+            elif 0.4 <= progress <= 0.6:
+                stage.set_color (yellow)
+            elif 0.6 <= progress <= 0.7:
+                stage.set_color (orange)
+            else:
+                stage.set_color (red)
         else:
-            stage.set_color (red)
+            if 0.0 <= progress <= 0.5:
+                stage.set_color (green)
+            elif 0.5 <= progress <= 0.75:
+                stage.set_color (yellow)
+            elif 0.75 <= progress <= 0.95:
+                stage.set_color (orange)
+            else:
+                stage.set_color (red)
     else:
         time_remaining.set_text (input.durationstring () )
         stage.set_color (black)
