@@ -22,7 +22,10 @@ timer = timer.Timer ()
 alternate_black = False
 absolute_time   = False
 
-def update_timer (timeline = None):
+def finalize (Unused = None):
+    clutter.main_quit ()
+
+def update_display (timeline = None):
     if timer.running ():
         time_elapsed.set_text (timer.elapsed () )
         time_remaining.set_text (timer.remaining () )
@@ -74,7 +77,7 @@ def parseKeyPress (self, event):
         character_key = chr (event.keyval)
 
     if event.keyval == clutter.keysyms.q or event.keyval == clutter.keysyms.Q:
-        clutter.main_quit ()
+        finalize ()
     elif event.keyval == clutter.keysyms.space:
         if timer.running ():
             timer.reset ()
@@ -97,15 +100,22 @@ def parseKeyPress (self, event):
             input.clear ()
     elif character_key.isdigit ():
         input.append (chr (event.keyval) )
-        update_timer ()
+        update_display ()
     else:
         print 'What to do with: ',  event.keyval
 
 def redraw (fullscreen = False):
     stage.set_fullscreen (fullscreen)
+
+    if fullscreen:
+        stage.set_size (screen.width_in_pixels, screen.height_in_pixels)
+
     stage_width, stage_height = stage.get_size ()
 
-    update_timer ()
+    time_elapsed.set_font_name ("Sans " + str (stage_height / 4) + "px")
+    time_remaining.set_font_name ("Sans " + str (stage_height / 4) + "px")
+
+    update_display ()
     text_width, text_height = time_remaining.get_size ()
 
     stage.add (time_elapsed)
@@ -118,20 +128,21 @@ def redraw_fullscreen ():
     redraw (fullscreen = True)
 
 stage = clutter.Stage ()
+stage.set_minimum_size (600, 400)
+stage.set_user_resizable (True)
+stage.set_title ("Event Timer");
 
 screen = Xlib.display.Display ().screen ()
-stage.set_size (screen.width_in_pixels, screen.height_in_pixels)
+#stage.set_size (screen.width_in_pixels, screen.height_in_pixels)
 
 stage.set_color (black)
-stage.connect ('key-press-event', parseKeyPress)
-time_elapsed = clutter.Text ()
+stage.connect ("key-press-event", parseKeyPress)
+stage.connect ("destroy", finalize)
 
-time_elapsed.set_font_name ("Sans " + str (screen.height_in_pixels / 4) + "px")
+time_elapsed = clutter.Text ()
 time_elapsed.set_color (white)
 
-
 time_remaining = clutter.Text ()
-time_remaining.set_font_name ("Sans " + str (screen.height_in_pixels / 4) + "px")
 time_remaining.set_color (white)
 
 stage.show_all ()
@@ -139,7 +150,7 @@ stage.show_all ()
 t = clutter.Timeline ()
 t.set_duration (250)
 t.set_loop (True)
-t.connect ('completed', update_timer)
+t.connect ('completed', update_display)
 t.start ()
 
 gobject.timeout_add (10,redraw)
