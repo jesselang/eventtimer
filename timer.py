@@ -64,7 +64,7 @@ class Timer:
    def progress(self):
       if datetime.datetime.now () >= self.ending:
          self.state = TimerState.Completed
-      elif self.started is None or self.duration is None:
+      elif self.started is None or self.duration is None or self.duration == 0:
          return 0.0
       else:
          return total_seconds(datetime.datetime.now() - self.started) / total_seconds(self.duration)
@@ -82,21 +82,30 @@ class Timer:
 
 class TimeInput:
    def __init__(self):
+      self.clear ()
+   def clear (self):
       self.digits = '0'*6
-      self.duration = datetime.timedelta()
-      #self.digitstack =
    def append(self, key):
       if key.isdigit ():
          self.digits = self.digits[1:] + key
-         self.duration = datetime.timedelta(hours=int(self.digits[0:2]),minutes=int(self.digits[2:4]),seconds=int(self.digits[4:6]))
       else:
-         raise SomeError;
-   def getduration(self):
-      return self.duration
+         raise ValueError ("Could not append '" + key + "' to TimeInput object")
+   def duration(self):
+      return datetime.timedelta(hours=int(self.digits[0:2]),minutes=int(self.digits[2:4]),seconds=int(self.digits[4:6]) )
    def durationstring (self):
-      return FormattedTime (self.duration)
+      return FormattedTime (self.duration () )
+   def durationUntil (self):
+      # self.duration represents a target time, not a time delta.
+      target_seconds = int(total_seconds (self.duration () ) )
+      target_time = datetime.datetime.now ().replace \
+         (hour=target_seconds / 60 / 60, minute=target_seconds / 60 % 60, second=target_seconds % 60)
+      if target_time <= datetime.datetime.now ():
+         raise ValueError ("Time entered has already occured.")
+      return target_time - datetime.datetime.now()
+   def tostring (self):
+      return self.digits [0:2] + ':' + self.digits [2:4] + ':' + self.digits [4:6]
    def __str__(self):
-      return self.durationstring ()
+      return self.tostring ()
 
 if __name__ == '__main__':
    print "Timer demo"

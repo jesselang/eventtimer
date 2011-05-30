@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import clutter
+import time
 import datetime
 import gobject
 import timer
@@ -17,10 +18,11 @@ timer = timer.Timer ()
 
 alternate_black = False
 
-def update_timer (timeline=None):
-    time_elapsed.set_text (timer.timeelapsed () )
+absolute_time = False
 
+def update_timer (timeline=None):
     if timer.running ():
+        time_elapsed.set_text (timer.timeelapsed () )
         time_remaining.set_text (timer.timeremaining () )
 
         progress = timer.progress ()
@@ -52,22 +54,42 @@ def update_timer (timeline=None):
             else:
                 stage.set_color (red)
     else:
-        time_remaining.set_text (input.durationstring () )
         stage.set_color (black)
+        time_remaining.set_text (input.tostring () )
+
+        if absolute_time:
+            time_elapsed.set_text (time.strftime ("%H:%M:%S", time.localtime () ) )
+            # Show the absolute labels?
+        else:
+            time_elapsed.set_text (timer.timeelapsed () )
 
 def parseKeyPress(self, event):
+    global absolute_time
     character_key = chr(0)
 
     if 0 <= event.keyval <= 255:
         character_key = chr(event.keyval)
-    if event.keyval == clutter.keysyms.q:
+
+    if event.keyval == clutter.keysyms.q or event.keyval == clutter.keysyms.Q:
         clutter.main_quit()
     elif event.keyval == clutter.keysyms.space:
         if timer.running ():
             timer.reset ()
         else:
-            timer.setduration (input.getduration ())
+            if absolute_time:
+                timer.setduration (input.durationUntil ())
+            else:
+                timer.setduration (input.duration ())
+
             timer.start ()
+    elif event.keyval == clutter.keysyms.at:
+        absolute_time = True
+    elif event.keyval == clutter.keysyms.Escape:
+        if timer.running ():
+            timer.reset ()
+        if absolute_time:
+            absolute_time = False
+            input.clear ()
     elif character_key.isdigit():
         input.append (chr (event.keyval) )
         update_timer ()
@@ -116,5 +138,5 @@ t.set_loop(True)
 t.connect('completed', update_timer)
 t.start()
 
-gobject.timeout_add(10,redraw_fullscreen)
+gobject.timeout_add(10,redraw)
 clutter.main()
