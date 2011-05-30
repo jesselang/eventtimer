@@ -78,7 +78,7 @@ def parseKeyPress (self, event):
             timer.reset ()
         else:
             if absolute_time:
-                timer.set (input.durationUntil () )
+                timer.set (input.duration_until () )
             else:
                 timer.set (input.duration () )
 
@@ -132,7 +132,7 @@ time_remaining.set_color (white)
 
 stage.show_all ()
 
-t=clutter.Timeline ()
+t = clutter.Timeline ()
 t.set_duration (250)
 t.set_loop (True)
 t.connect ('completed', update_timer)

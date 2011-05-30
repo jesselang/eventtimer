@@ -115,10 +115,7 @@ class TimeInput:
       return datetime.timedelta \
          (hours = int (self.digits [0:2]), minutes = int (self.digits [2:4]), seconds = int (self.digits [4:6]) )
 
-   def durationstring (self):
-      return formatted_time (self.duration () )
-
-   def durationUntil (self):
+   def duration_until (self):
       # self.duration represents a target time, not a time delta.
       target_seconds = int (total_seconds (self.duration () ) )
       target_time = datetime.datetime.now ().replace \
