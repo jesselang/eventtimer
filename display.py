@@ -121,13 +121,12 @@ stage.set_size (screen.width_in_pixels, screen.height_in_pixels)
 stage.set_color (black)
 stage.connect ('key-press-event', parseKeyPress)
 time_elapsed = clutter.Text ()
-# Dynamically set the font size based on screen size?
+
 time_elapsed.set_font_name ("Sans " + str (screen.height_in_pixels / 4) + "px")
 time_elapsed.set_color (white)
 
 
 time_remaining = clutter.Text ()
-# Dynamically set the font size based on screen size?
 time_remaining.set_font_name ("Sans " + str (screen.height_in_pixels / 4) + "px")
 time_remaining.set_color (white)
 
