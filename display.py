@@ -7,12 +7,13 @@ import timer
 import Xlib.display
 
 # Colors
-white  = clutter.Color (255, 255, 255, 255)
-black  = clutter.Color (  0,   0,   0, 255)
-green  = clutter.Color (  0, 128,   0, 255)
-yellow = clutter.Color (200, 200,   0, 255)
-orange = clutter.Color (255, 128,   0, 255)
-red    = clutter.Color (255,   0,   0, 255)
+white    = clutter.Color (255, 255, 255, 255)
+black    = clutter.Color (  0,   0,   0, 255)
+darkgrey = clutter.Color ( 80,  80,  80, 255)
+green    = clutter.Color (  0, 128,   0, 255)
+yellow   = clutter.Color (200, 200,   0, 255)
+orange   = clutter.Color (255, 128,   0, 255)
+red      = clutter.Color (255,   0,   0, 255)
 
 # Objects
 input = timer.TimeInput ()
@@ -55,13 +56,14 @@ def update_timer (timeline = None):
             else:
                 stage.set_color (red)
     else:
-        stage.set_color (black)
         time_remaining.set_text (input.to_string () )
 
         if absolute_time:
+            stage.set_color (darkgrey)
             time_elapsed.set_text (time.strftime ("%H:%M:%S", time.localtime () ) )
             # Show the absolute labels?
         else:
+            stage.set_color (black)
             time_elapsed.set_text (timer.elapsed () )
 
 def parseKeyPress (self, event):
@@ -88,8 +90,10 @@ def parseKeyPress (self, event):
     elif event.keyval == clutter.keysyms.Escape:
         if timer.running ():
             timer.reset ()
-        if absolute_time:
+        elif absolute_time:
             absolute_time = False
+            input.clear ()
+        else:
             input.clear ()
     elif character_key.isdigit ():
         input.append (chr (event.keyval) )
