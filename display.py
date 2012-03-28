@@ -32,7 +32,7 @@ def update_display (timeline = None):
 
         progress = timer.progress ()
 
-        if timer.seconds_remaining () <= 60:
+        if 1 <= timer.seconds_remaining () <= 60:
             global alternate_black
             alternate_black = not alternate_black
 

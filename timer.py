@@ -17,6 +17,8 @@ def formatted_time (timedelta):
 Timer_State = enum.Enum (["stopped", "running", "completed"])
 
 class Timer:
+   Zero = datetime.timedelta (0, 0, 0)
+
    def __init__ (self):
       self.reset ()
 
@@ -25,13 +27,13 @@ class Timer:
       self.started = datetime.datetime.now ()
       # We add a fudge second to make the time remaining look correct,
       # in place of displaying the ceiling of the fractional seconds.
-      if self.duration is not None:
+      if self.duration != Timer.Zero:
          self.ending = self.started + self.duration + datetime.timedelta (seconds = 1)
 
    def reset (self):
       self.state    = Timer_State.stopped
       self.started  = None
-      self.duration = None
+      self.duration = Timer.Zero
       self.ending   = None
 
    def update_state (self): # Internal operation.
@@ -64,7 +66,7 @@ class Timer:
       # Examine to see if only the time state alone can be used in the conditions.
       if self.state == Timer_State.completed:
          return formatted_time (datetime.timedelta (0) )
-      elif self.started is None and self.duration is not None:
+      elif self.started is None and self.duration != Timer.Zero:
          return formatted_time (self.duration);
       elif self.ending is None:
          return formatted_time (datetime.timedelta (0) )
@@ -77,7 +79,7 @@ class Timer:
       # Examine to see if only the time state alone can be used in the conditions.
       if self.state == Timer_State.completed:
          return 1.0
-      elif self.started is None or self.duration is None or self.duration == 0:
+      elif self.started is None or self.duration == Timer.Zero:
          return 0.0
       else:
          return total_seconds (datetime.datetime.now () - self.started) / total_seconds (self.duration)
@@ -86,7 +88,7 @@ class Timer:
       self.update_state ()
 
       # Examine to see if only the time state alone can be used in the conditions.
-      if self.started is None or self.duration is None or self.state != Timer_State.running:
+      if self.started is None or self.duration == Timer.Zero or self.state != Timer_State.running:
          return 0
       else:
          return total_seconds(self.ending - datetime.datetime.now () )
