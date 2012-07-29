@@ -1,3 +1,6 @@
+# Enumeration class.
+# Example:
+# Level = enum.Enum (["one", "two", "three"])
 class Enum(set):
    def __getattr__(self, name):
       if name in self:
