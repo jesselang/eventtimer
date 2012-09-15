@@ -4,7 +4,6 @@ import time
 import datetime
 import gobject
 import timer
-import Xlib.display
 
 # Colors
 white    = Clutter.Color.new (255, 255, 255, 255)
@@ -21,6 +20,7 @@ timer = timer.Timer ()
 
 alternate_black = False
 absolute_time   = False
+fullscreen      = False
 
 def finalize (Unused = None):
     Clutter.main_quit ()
@@ -70,7 +70,7 @@ def update_display (timeline = None):
             time_elapsed.set_text (timer.elapsed () )
 
 def parseKeyPress (self, event):
-    global absolute_time
+    global absolute_time, fullscreen
     character_key = chr (0)
 
     if 0 <= event.keyval <= 255:
@@ -78,6 +78,9 @@ def parseKeyPress (self, event):
 
     if character_key == 'q' or character_key == 'Q':
         finalize ()
+    elif character_key == 'f':
+        stage.set_fullscreen (not fullscreen)
+        fullscreen = not fullscreen
     elif character_key == ' ':
         if timer.running ():
             timer.reset ()
@@ -104,12 +107,7 @@ def parseKeyPress (self, event):
     else:
         print 'What to do with: ',  event.keyval
 
-def redraw (fullscreen = False):
-    stage.set_fullscreen (fullscreen)
-
-    if fullscreen:
-        stage.set_size (screen.width_in_pixels, screen.height_in_pixels)
-
+def redraw (*kargs):
     stage_width, stage_height = stage.get_size ()
 
     time_elapsed.set_font_name ("Sans " + str (stage_height / 4) + "px")
@@ -118,14 +116,8 @@ def redraw (fullscreen = False):
     update_display ()
     text_width, text_height = time_remaining.get_size ()
 
-    stage.add_actor (time_elapsed)
-    stage.add_actor (time_remaining)
-
     time_elapsed.set_position (stage_width / 2 - text_width / 2, stage_height / 3 - text_height / 2)
     time_remaining.set_position (stage_width / 2 - text_width / 2, stage_height / 3 * 2 - text_height / 2)
-
-def redraw_fullscreen ():
-    redraw (fullscreen = True)
 
 Clutter.init(None)
 
@@ -134,11 +126,9 @@ stage.set_minimum_size (600, 400)
 stage.set_user_resizable (True)
 stage.set_title ("Event Timer");
 
-screen = Xlib.display.Display ().screen ()
-#stage.set_size (screen.width_in_pixels, screen.height_in_pixels)
-
 stage.set_color (black)
 stage.connect_after ("key-press-event", parseKeyPress)
+stage.connect ("allocation-changed", redraw)
 stage.connect ("destroy", finalize)
 
 time_elapsed = Clutter.Text ()
@@ -146,6 +136,9 @@ time_elapsed.set_color (white)
 
 time_remaining = Clutter.Text ()
 time_remaining.set_color (white)
+stage.add_actor (time_elapsed)
+stage.add_actor (time_remaining)
+
 
 stage.show_all ()
 
