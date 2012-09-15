@@ -136,10 +136,11 @@ time_elapsed.set_color (white)
 
 time_remaining = Clutter.Text ()
 time_remaining.set_color (white)
+
 stage.add_actor (time_elapsed)
 stage.add_actor (time_remaining)
 
-
+redraw()
 stage.show_all ()
 
 t = Clutter.Timeline ()
