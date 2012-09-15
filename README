@@ -1,0 +1,23 @@
+eventtimer
+
+I work in different conference situations that follow specific schedules that naturally, the speakers/presenters have a hard time sticking to. I wanted a screen that could serve as a friendly reminder of where we are the session, and how much time is left.
+
+eventtimer uses Python with the GObject-Introspection binding to clutter. All time displays are in the computer's current timezone.
+
+eventtimer provides 3 modes: Ongoing, relative, and absolute.
+
+
+Ongoing mode gives the current military time, and an incrementing timer. Useful when you don't have a specific end time in mind, but want to keep an eye on the current time and how long the session has been in progress. To use ongoing mode, start the timer without specifying an end time.
+
+The following 2 modes are countdown modes. You specify a specific end time, and when you start the timer, the time elapsed since starting the timer, and time remaining until the end time are displayed. Relative mode lets you specify a relative end time, such as 5 minutes, 1 hour and 20 minutes. Absolute mode lets you specify an absolute end time.
+
+To specify an end time, use the number keys before starting the timer.
+
+Commands:
+Escape	Reset the timer.
+Space	Start/stop the timer.
+@	Enter absolute mode.
+
+
+Enhancements I've considered:
+Ability to pause the timer.
